@@ -1,9 +1,9 @@
-##Task
+# Task
 
 Design and implement a RESTful API (including data model and the backing implementation) for
 money transfers between accounts.
 
-###Requirements
+## Requirements
 
 1. You can use Java or Kotlin.
 2. Keep it simple and to the point (e.g. no need to implement any authentication).
@@ -14,3 +14,6 @@ requirement #2 and keep it simple and avoid heavy frameworks.
 6. The final result should be executable as a standalone program (should not require a
 pre-installed container/server).
 7. Demonstrate with tests that the API works as expected.
+
+
+Click to see [Money transfer API](https://dexm89.github.io/simple-money-transfer/)
