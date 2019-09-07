@@ -1,0 +1,314 @@
+swagger: "2.0"
+info:
+  description: "This is a simple RESTful API for money transfers between accounts."
+  version: "1.0.0"
+  title: "Money transfer"
+host: "localhost:8080"
+tags:
+- name: "customer"
+  description: "Everything about customers"
+- name: "account"
+  description: "Everything about accounts"
+- name: "transaction"
+  description: "Operations between accounts"
+schemes:
+- "http"
+paths:
+  /customers:
+    get:
+      tags:
+      - customer
+      summary: "Get all customers"
+      operationId: "getCustomers"
+      produces:
+      - application/json
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CustomerDto'
+        404:
+          description: "Customers not found"
+          schema:
+            $ref: '#/definitions/ApiError'
+    post:
+      tags:
+      - customer
+      summary: "Add a new customer"
+      operationId: "addCustomer"
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        description: "Customer object that needs to be added"
+        required: true
+        schema:
+          $ref: '#/definitions/Customer'
+      responses:
+        201:
+          description: "Customer created"
+          schema:
+            $ref: '#/definitions/CustomerDto'
+        400:
+          description: "Invalid input"
+          schema:
+            $ref: '#/definitions/ApiError'
+    put:
+      tags:
+      - customer
+      summary: "Update a customer"
+      operationId: "updateCustomer"
+      consumes:
+      - application/json
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Customer object that needs to be updated"
+        required: true
+        schema:
+          $ref: '#/definitions/Customer'
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid input"
+          schema:
+            $ref: '#/definitions/ApiError'
+        404:
+          description: "Customer not found"
+          schema:
+            $ref: '#/definitions/ApiError'
+  '/customers/{customerId}':
+    get:
+      tags:
+      - customer
+      summary: "Get a customer by id"
+      operationId: "getCustomer"
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: customerId
+        type: integer
+        description: "Customer id to search"
+        required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: '#/definitions/Customer'
+        404:
+          description: "Customer not found"
+          schema:
+            $ref: '#/definitions/ApiError'
+  '/customers/{customerId}/accounts':
+    get:
+      tags:
+      - customer
+      summary: "Get all accounts of a customer"
+      operationId: "getAccounts"
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: customerId
+        type: integer
+        description: "Customer id to search"
+        required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AccountDto'
+        404:
+          description: "Accounts not found"
+          schema:
+            $ref: '#/definitions/ApiError'
+    post:
+      tags:
+      - customer
+      summary: "Add a new account"
+      operationId: "addAccount"
+      consumes:
+      - application/json
+      parameters:
+      - in: path
+        name: customerId
+        type: integer
+        description: "Customer id"
+        required: true
+      - in: body
+        name: body
+        description: "Account object that needs to be added"
+        required: true
+        schema:
+          $ref: '#/definitions/Account'
+      responses:
+        201:
+          description: "Account created"
+          schema:
+            $ref: '#/definitions/AccountDto'
+        400:
+          description: "Invalid input"
+          schema:
+            $ref: '#/definitions/ApiError'
+  '/accounts/{accountId}':
+    get:
+      tags:
+      - account
+      summary: "Get an account by id"
+      operationId: "getAccount"
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: accountId
+        type: integer
+        description: "Account id to search"
+        required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: '#/definitions/Account'
+        404:
+          description: "Account not found"
+          schema:
+            $ref: '#/definitions/ApiError'
+  '/accounts/{accountId}/transactions':
+    get:
+      tags:
+      - account
+      summary: "Get transactions by account id"
+      operationId: "getTransactions"
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: accountId
+        type: integer
+        description: "Account id to search"
+        required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TransactionDto'
+        404:
+          description: "Transactions not found"
+          schema:
+            $ref: '#/definitions/ApiError'
+  '/transactions':
+    post:
+      tags:
+      - transaction
+      summary: "Transfer money between accounts"
+      operationId: "transferMoney"
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        description: "Transaction request to transfer"
+        required: true
+        schema:
+          $ref: '#/definitions/TransactionRequest'
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: '#/definitions/TransactionDto'
+        409:
+          description: "Source account currency differs of target"
+          schema:
+            $ref: '#/definitions/ApiError'
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: '#/definitions/ApiError'
+definitions:
+  Customer:
+    type: object
+    required:
+    - firstName
+    - lastName
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+  CustomerDto:
+    type: object
+    properties:
+      customerId:
+        type: integer
+      firstName:
+        type: string
+      lastName:
+        type: string
+  Account:
+    type: object
+    required:
+    - currency
+    - balance
+    properties:
+      currency:
+        type: string
+        maxLength: 3
+      balance:
+        type: string
+        format: currency
+  AccountDto:
+    type: object
+    properties:
+      accountId:
+        type: integer
+      currency:
+        type: string
+      balance:
+        type: string
+        format: currency
+  TransactionRequest:
+    type: object
+    required:
+    - accIdToDebit
+    - accIdToCredit
+    - amount
+    properties:
+      accIdToDebit:
+        type: integer
+      accIdToCredit:
+        type: integer
+      amount:
+        type: string
+        format: currency
+  TransactionDto:
+    type: object
+    properties:
+      transactionId:
+        type: integer
+      fromAccount:
+        type: integer
+      toAccount:
+        type: integer
+      amount:
+        type: number
+        format: currency
+  ApiError:
+    type: object
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
